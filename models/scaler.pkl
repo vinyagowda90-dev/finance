@@ -1,1 +1,43 @@
+import pandas as pd
+import joblib
 
+from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+
+# Load Dataset
+df = pd.read_csv("data/Finance_data.csv")
+
+# Encode categorical columns
+encoders = {}
+
+for col in df.columns:
+
+    if df[col].dtype == "object":
+
+        le = LabelEncoder()
+
+        df[col] = le.fit_transform(
+            df[col].astype(str)
+        )
+
+        encoders[col] = le
+
+# Target column
+target = "Avenue"
+
+X = df.drop(target, axis=1)
+y = df[target]
+
+# Create Scaler
+scaler = StandardScaler()
+
+X_scaled = scaler.fit_transform(X)
+
+# Save Scaler
+joblib.dump(
+    scaler,
+    "models/scaler.pkl"
+)
+
+print("Scaler Saved Successfully!")
