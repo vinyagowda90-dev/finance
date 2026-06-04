@@ -1,1 +1,60 @@
+import pandas as pd
+import joblib
 
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+
+# Load Dataset
+df = pd.read_csv("data/Finance_data.csv")
+
+# Encode categorical columns
+encoders = {}
+
+for col in df.columns:
+
+    if df[col].dtype == "object":
+
+        le = LabelEncoder()
+
+        df[col] = le.fit_transform(
+            df[col].astype(str)
+        )
+
+        encoders[col] = le
+
+# Target column
+target = "Avenue"
+
+X = df.drop(target, axis=1)
+y = df[target]
+
+# Split dataset
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.2,
+    random_state=42
+)
+
+# Train Logistic Regression
+model = LogisticRegression(
+    max_iter=1000,
+    random_state=42
+)
+
+model.fit(X_train, y_train)
+
+# Save model
+joblib.dump(
+    model,
+    "models/logistic_regression.pkl"
+)
+
+# Save encoders
+joblib.dump(
+    encoders,
+    "models/encoders.pkl"
+)
+
+print("Logistic Regression Model Saved Successfully!")
